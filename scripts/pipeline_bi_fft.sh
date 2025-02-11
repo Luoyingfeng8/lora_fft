@@ -21,7 +21,7 @@ for l in de cs ru zh fi kk he is; do
 		lp=${src}2${tgt}
         tag=$lang_pair
         # data
-        dataset_dir=$ROOT_DIR/data/multi_llama_factory
+        dataset_dir=$ROOT_DIR/data/fine-tuning_data/multi_llama_factory
         train_data=train-$lang_pair
         eval_dataset=valid-$lang_pair
 
