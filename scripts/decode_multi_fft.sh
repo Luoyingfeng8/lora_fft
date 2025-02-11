@@ -20,7 +20,7 @@ output_dir=$ROOT_DIR/exps/$model_name/$task
 mkdir -p $output_dir
 cp $0 $output_dir
 
-record_file=./multi_fft_eval_result.txt
+record_file=./multi_fft_eval_result_new.txt
 
 # llamafactory-cli train \
 #     --deepspeed  $config_file \

@@ -7,6 +7,7 @@ for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B;do
 template=default
 dropout=0.05
 model_dir=$ROOT_DIR/model_card/$model_name
+record_file=./multi_lora_eval_result_new.txt
 for rank in 128;do
     for learning_rate in 5e-5; do
         task=lora_multi_${rank}_${learning_rate}_${dropout}_2epoch_attention_MLP
@@ -150,7 +151,6 @@ for rank in 128;do
 
             test_file=$ROOT_DIR/data/fine-tuning_data/common/$lan-en/test.$lp.json
             hypo_file=$predict_model_dir/decode_result/$lp/generated_predictions.jsonl
-            record_file=./multi_lora_eval_result.txt
 
             python ../src/compute_bleu_comet.py \
                 --metric "bleu,comet_22" \

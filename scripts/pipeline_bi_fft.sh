@@ -7,7 +7,7 @@ for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B;do
 template=default
 task=fft_1e-5_2epoch
 model_dir=$ROOT_DIR/model_card/$model_name
-
+record_file=./fft_eval_result.txt
 for l in de cs ru zh fi kk he is; do
 	for src in $l en; do
 
@@ -141,7 +141,7 @@ for l in de cs ru zh fi kk he is; do
 
     test_file=$ROOT_DIR/data/common/$l-en/test.$lp.json
     hypo_file=$predict_model_dir/decode_result/generated_predictions.jsonl
-    record_file=./fft_eval_result.txt
+    
     
     python ../src/compute_bleu_comet.py \
         --metric "bleu,comet_22" \
