@@ -139,7 +139,7 @@ for l in de cs ru zh fi kk he is; do
 
     # # eval_stage
 
-    test_file=$ROOT_DIR/data/common/$l-en/test.$lp.json
+    test_file=$ROOT_DIR/data/fine-tuning_data/common/$l-en/test.$lp.json
     hypo_file=$predict_model_dir/decode_result/generated_predictions.jsonl
     
     
