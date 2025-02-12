@@ -5,7 +5,7 @@ ROOT_DIR=$(dirname $(dirname `readlink -f $0`))
 record_file=./bi_fft_result.txt
 
 # model
-for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B Qwen2.5-14B;do
+for model_name in Qwen2.5-1.5B Qwen2.5-7B Qwen2.5-3B Qwen2.5-14B;do
 
 if [ $model_name = "Qwen2.5-14B" ]; then
 	per_device_train_batch_size=5
