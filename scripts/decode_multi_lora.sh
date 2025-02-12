@@ -3,7 +3,7 @@ set -eux
 ROOT_DIR=$(dirname $(dirname `readlink -f $0`))
 
 # model
-for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B;do
+for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B Qwen2.5-14B;do
 template=default
 dropout=0.05
 model_dir=$ROOT_DIR/model_card/$model_name
