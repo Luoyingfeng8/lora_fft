@@ -2,8 +2,17 @@
 set -eux
 ROOT_DIR=$(dirname $(dirname `readlink -f $0`))
 
+record_file=./multi_fft_eval_result.txt
 # model
-for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B ;do
+for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B Qwen2.5-14B;do
+if [ $model_name = "Qwen2.5-14B" ]; then
+	per_device_train_batch_size=5
+        gradient_accumulation_steps=8
+else 
+	per_device_train_batch_size=9
+ 	gradient_accumulation_steps=4
+fi
+
 template=default
 model_dir=$ROOT_DIR/model_card/$model_name
 
@@ -37,9 +46,9 @@ llamafactory-cli train \
     --lr_scheduler_type cosine \
     --warmup_ratio 0.01 \
     --num_train_epochs 2 \
-    --per_device_train_batch_size 9 \
-    --per_device_eval_batch_size 12 \
-    --gradient_accumulation_steps 4 \
+    --per_device_train_batch_size $per_device_train_batch_size \
+    --per_device_eval_batch_size $per_device_train_batch_size \
+    --gradient_accumulation_steps $gradient_accumulation_steps \
     --eval_steps 0.1 \
     --save_steps 0.1 \
     --num_beams 5 \
@@ -57,11 +66,9 @@ llamafactory-cli train \
     --evaluation_strategy steps \
     --save_strategy steps \
     --logging_strategy steps \
-    --report_to "tensorboard" \
+    --report_to "none" \
     --ddp_timeout 180000000 \
     | tee $output_dir/train.log
-
-
 
 
     log_path=$ROOT_DIR/exps/$model_name/$task/train.log
@@ -91,7 +98,7 @@ llamafactory-cli train \
     predict_model_dir=$ROOT_DIR/exps/$model_name/$task/checkpoint-$predict_model_id
 
 
-    for lan in de cs ru zh;do
+    for lan in de cs ru zh fi kk he is;do
         for src in $lan en ;do
         # predict_stage
 
@@ -140,7 +147,6 @@ llamafactory-cli train \
 
         test_file=$ROOT_DIR/data/fine-tuning_data/common/$lan-en/test.$lp.json
         hypo_file=$predict_model_dir/decode_result/$lp/generated_predictions.jsonl
-        record_file=./multi_fft_eval_result.txt
 
         python ../src/compute_bleu_comet.py \
             --metric "bleu,comet_22" \
