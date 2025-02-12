@@ -104,7 +104,7 @@ for rank in 128;do
         predict_model_dir=$ROOT_DIR/exps/$model_name/$task/adapter/checkpoint-$predict_model_id
 
 
-        for lan in de cs ru zh;do
+        for lan in de cs ru zh fi kk he is;do
             for src in $lan en ;do
             # predict_stage
 
