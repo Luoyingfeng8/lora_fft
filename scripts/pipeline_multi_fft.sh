@@ -70,7 +70,9 @@ llamafactory-cli train \
     --ddp_timeout 180000000 \
     | tee $output_dir/train.log
 
-
+	# 删除优化器
+	rm -rf $ROOT_DIR/exps/$model_name/$task/$tag/*/global_step*
+    
     log_path=$ROOT_DIR/exps/$model_name/$task/train.log
 
     folder=$ROOT_DIR/exps/$model_name/$task
