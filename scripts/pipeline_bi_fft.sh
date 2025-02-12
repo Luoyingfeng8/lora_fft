@@ -59,7 +59,7 @@ for l in de cs ru zh fi kk he is; do
             --warmup_ratio 0.01 \
             --num_train_epochs 2 \
             --per_device_train_batch_size $per_device_train_batch_size \
-            --per_device_eval_batch_size 4 \
+            --per_device_eval_batch_size $per_device_train_batch_size \
             --gradient_accumulation_steps $gradient_accumulation_steps \
             --eval_steps 0.1 \
             --save_steps 0.1 \
