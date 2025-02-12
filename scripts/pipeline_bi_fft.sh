@@ -2,23 +2,33 @@
 set -eux
 ROOT_DIR=$(dirname $(dirname `readlink -f $0`))
 
+record_file=./bi_fft_result.txt
+
 # model
-for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B;do
+for model_name in Qwen2.5-7B Qwen2.5-1.5B Qwen2.5-3B Qwen2.5-14B;do
+
+if [ $model_name = "Qwen2.5-14B" ]; then
+	per_device_train_batch_size=5
+        gradient_accumulation_steps=2
+else 
+	per_device_train_batch_size=9
+ 	gradient_accumulation_steps=1
+fi
+
 template=default
 task=fft_1e-5_2epoch
 model_dir=$ROOT_DIR/model_card/$model_name
-record_file=./fft_eval_result.txt
 for l in de cs ru zh fi kk he is; do
 	for src in $l en; do
 
         # train_stage
-		if [ $src = "en" ]; then
-			tgt=$l
-		else 
-			tgt=en
-		fi
-		lang_pair=${src}-$tgt
-		lp=${src}2${tgt}
+	if [ $src = "en" ]; then
+		tgt=$l
+	else 
+		tgt=en
+	fi
+	lang_pair=${src}-$tgt
+	lp=${src}2${tgt}
         tag=$lang_pair
         # data
         dataset_dir=$ROOT_DIR/data/fine-tuning_data/multi_llama_factory
@@ -48,9 +58,9 @@ for l in de cs ru zh fi kk he is; do
             --lr_scheduler_type cosine \
             --warmup_ratio 0.01 \
             --num_train_epochs 2 \
-            --per_device_train_batch_size 9 \
-            --per_device_eval_batch_size 8 \
-            --gradient_accumulation_steps 1 \
+            --per_device_train_batch_size $per_device_train_batch_size \
+            --per_device_eval_batch_size 4 \
+            --gradient_accumulation_steps $gradient_accumulation_steps \
             --eval_steps 0.1 \
             --save_steps 0.1 \
             --num_beams 5 \
@@ -68,14 +78,16 @@ for l in de cs ru zh fi kk he is; do
             --evaluation_strategy steps \
             --save_strategy steps \
             --logging_strategy steps \
-            --report_to "tensorboard" \
+            --report_to "None" \
             --ddp_timeout 180000000 \
             | tee $output_dir/train.log
 
+ 	# 删除优化器
+	rm -rf $ROOT_DIR/exps/$model_name/$task/$tag/*/global_step*
+  
         # predict_stage
         
         log_path=$ROOT_DIR/exps/$model_name/$task/$tag/train.log
-
         folder=$ROOT_DIR/exps/$model_name/$task/$tag
 
         check_point_strs=""
@@ -101,8 +113,7 @@ for l in de cs ru zh fi kk he is; do
                 --check_point_strs $check_point_strs)
         predict_model_dir=$ROOT_DIR/exps/$model_name/$task/$tag/checkpoint-$predict_model_id
         #predict_model_dir=/mnt/luoyingfeng/lora4mt/exps/$model_name/$task/$tag/checkpoint-418
-        dataset_dir=$ROOT_DIR/data/multi_llama_factory
-        test_dataset=test-$lang_pair #
+        test_dataset=test-$lang_pair 
 
         output_dir=$predict_model_dir/decode_result
         mkdir -p $output_dir
@@ -121,7 +132,7 @@ for l in de cs ru zh fi kk he is; do
             --do_eval False \
             --do_predict \
             --use_fast_tokenizer True \
-            --per_device_eval_batch_size 16 \
+            --per_device_eval_batch_size 8 \
             --predict_with_generate \
             --logging_steps 0.01 \
             --preprocessing_num_workers 16 \
