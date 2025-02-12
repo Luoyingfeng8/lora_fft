@@ -72,7 +72,7 @@ for rank in 128;do
             --evaluation_strategy steps \
             --save_strategy steps \
             --logging_strategy steps \
-            --report_to "tensorboard" \
+            --report_to "none" \
             --ddp_timeout 180000000 \
             | tee $output_dir/train.log
 
